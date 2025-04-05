@@ -1,103 +1,78 @@
-import Image from "next/image";
+"use client";
+import { useState } from "react";
+import { generateCode } from "@/lib/gemini";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    const [generatedCode, setGeneratedCode] = useState("");
+    const [files, setFiles] = useState<Record<string, string>>({});
+    const [inputValue, setInputValue] = useState("");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+    const getCode = async () => {
+        const result = await generateCode(inputValue);
+        setFiles(result.files || {});
+        setGeneratedCode(result.code);
+    };
+
+    return (
+        <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+            <h1 style={{ fontSize: "24px", color: "#ff6200" }}>
+                Your seeing the working on project bolt.inAction
+            </h1>
+            <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder="Type something..."
+                style={{
+                    height: "40px",
+                    width: "300px",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    padding: "8px",
+                    marginBottom: "16px",
+                }}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <button
+                onClick={getCode}
+                style={{
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    padding: "8px 16px",
+                    borderRadius: "4px",
+                    border: "none",
+                    cursor: "pointer",
+                }}
+            >
+                Generate Code
+            </button>
+            <h2 style={{ fontSize: "20px", marginTop: "30px" }}>
+                Generated Code:
+            </h2>
+            {Object.keys(files).length > 0 ? (
+                Object.entries(files).map(([filePath, content]) => (
+                    <div key={filePath} style={{ marginBottom: "20px" }}>
+                        <h3 style={{ fontSize: "18px", color: "#333" }}>
+                            {filePath}
+                        </h3>
+                        <pre
+                            style={{
+                                backgroundColor: "#f4f4f4",
+                                padding: "15px",
+                                borderRadius: "5px",
+                                overflowX: "auto",
+                                whiteSpace: "pre-wrap",
+                                fontFamily: "monospace",
+                            }}
+                        >
+                            {content}
+                        </pre>
+                    </div>
+                ))
+            ) : (
+                <pre style={{ fontFamily: "monospace" }}>
+                    {generatedCode || "Click 'Generate Code' to see the result..."}
+                </pre>
+            )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    );
 }
