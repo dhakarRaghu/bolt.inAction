@@ -1,78 +1,51 @@
 "use client";
-import { useState } from "react";
-import { generateCode } from "@/lib/gemini";
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Wand2 } from 'lucide-react';
 
 export default function Home() {
-    const [generatedCode, setGeneratedCode] = useState("");
-    const [files, setFiles] = useState<Record<string, string>>({});
-    const [inputValue, setInputValue] = useState("");
+  const [prompt, setPrompt] = useState('');
+  const router = useRouter();
 
-    const getCode = async () => {
-        const result = await generateCode(inputValue);
-        setFiles(result.files || {});
-        setGeneratedCode(result.code);
-    };
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (prompt.trim()) {
+      router.push(`/builder?prompt=${encodeURIComponent(prompt)}`);
+    }
+  };
 
-    return (
-        <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
-            <h1 style={{ fontSize: "24px", color: "#ff6200" }}>
-                Your seeing the working on project bolt.inAction
-            </h1>
-            <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Type something..."
-                style={{
-                    height: "40px",
-                    width: "300px",
-                    border: "1px solid #ccc",
-                    borderRadius: "4px",
-                    padding: "8px",
-                    marginBottom: "16px",
-                }}
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
+      <div className="max-w-2xl w-full">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <Wand2 className="w-12 h-12 text-blue-400" />
+          </div>
+          <h1 className="text-4xl font-bold text-gray-100 mb-4">
+            Website Builder AI
+          </h1>
+          <p className="text-lg text-gray-300">
+            Describe your dream website, and we'll help you build it step by step
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6">
+            <textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Describe the website you want to build..."
+              className="w-full h-32 p-4 bg-gray-900 text-gray-100 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none placeholder-gray-500"
             />
             <button
-                onClick={getCode}
-                style={{
-                    backgroundColor: "#007bff",
-                    color: "white",
-                    padding: "8px 16px",
-                    borderRadius: "4px",
-                    border: "none",
-                    cursor: "pointer",
-                }}
+              type="submit"
+              className="w-full mt-4 bg-blue-600 text-gray-100 py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
             >
-                Generate Code
+              Generate Website Plan
             </button>
-            <h2 style={{ fontSize: "20px", marginTop: "30px" }}>
-                Generated Code:
-            </h2>
-            {Object.keys(files).length > 0 ? (
-                Object.entries(files).map(([filePath, content]) => (
-                    <div key={filePath} style={{ marginBottom: "20px" }}>
-                        <h3 style={{ fontSize: "18px", color: "#333" }}>
-                            {filePath}
-                        </h3>
-                        <pre
-                            style={{
-                                backgroundColor: "#f4f4f4",
-                                padding: "15px",
-                                borderRadius: "5px",
-                                overflowX: "auto",
-                                whiteSpace: "pre-wrap",
-                                fontFamily: "monospace",
-                            }}
-                        >
-                            {content}
-                        </pre>
-                    </div>
-                ))
-            ) : (
-                <pre style={{ fontFamily: "monospace" }}>
-                    {generatedCode || "Click 'Generate Code' to see the result..."}
-                </pre>
-            )}
-        </div>
-    );
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
